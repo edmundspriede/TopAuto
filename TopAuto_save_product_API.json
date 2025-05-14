@@ -1,0 +1,397 @@
+{
+  "name": "TopAuto save product API",
+  "nodes": [
+    {
+      "parameters": {
+        "include": "none",
+        "options": {}
+      },
+      "id": "4e76b2fb-3e58-40ef-8fcb-c0ff68ef8c3b",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.1,
+      "position": [
+        1400,
+        620
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {},
+      "id": "4cbc77f3-15f4-480f-a960-7b67aba8e3a6",
+      "name": "Articles",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        380
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "23347567-36dd-4a31-99eb-4f93b24b7b85",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7595d3a5-488f-42cd-be9f-c889f5ec1c11",
+      "name": "Existing or New",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://top-auto.tkoborblek-ewx3lq0nk4zq.p.temp-site.link/wp-json/custom/v1/update-sku",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"sku\" : \"{{ $('Articles').item.json.matchcode }}\",\n   \"price\" : \"{{ $('Articles').item.json.avg_price }}\" ,\n   \"stock\"  : \"{{ $('Articles').item.json.availability }}\",\n   \"articleid\"  : \"{{ $('Articles').item.json.id }}\"\n }",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "6dcb3553-8498-413f-9c4f-939c6ecc0ff3",
+      "name": "Update by SKU1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        940,
+        380
+      ],
+      "executeOnce": false,
+      "notesInFlow": true,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "vMYoFU28rsiQejPD",
+          "name": "Top Auto WP"
+        }
+      },
+      "notes": "New"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://top-auto.tkoborblek-ewx3lq0nk4zq.p.temp-site.link/wp-json/wc/v3/products/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\n   \"sku\" : \"{{ $('Articles').item.json.matchcode }}\",\n   \"categories\" : {{ $('Edit Fields3').item.json.c_ }} ,\n   \"price\" : \"{{ $('Articles').item.json.avg_price }}\" ,\n   \"regular_price\" : \"{{ $('Articles').item.json.avg_price }}\" ,\n   \"manage_stock\" : true,\n   \"stock_quantity\" : \"{{ $('Articles').item.json.availability }}\" ,\n   \"weight\" :  \"na\" ,\n   \"name\" : \"{{ $('Articles').item.json.articlename }}\",\n   \"description\" : \"{{ $('Articles').item.json.description }} {{ $('Articles').item.json.manufacturer_description }}\",\n   \"status\" : \"publish\",\n   \"attributes\" : [\n      \n      \n       {  \"id\": 4, \"options\" : [ \"{{ $('Articles').item.json.brandname }}\" ] , \"visible\" : true },\n       {  \"id\": 44, \"options\" : [ \"{{  $ifEmpty( $('Articles').item.json.dot_year, \"na\" ) }}\" ]  , \"visible\" : true },\n       {  \"id\": 10, \"options\" : [ \"{{ $('Articles').item.json.width }}\" ]  , \"visible\" : true },\n       {  \"id\": 11, \"options\" : [ \"{{ $('Articles').item.json.height }}\" ]  , \"visible\" : true },\n       {  \"id\": 12 , \"options\" : [ \"{{ $('Articles').item.json.inner_diameter }}\" ] , \"visible\" : true },\n       {  \"id\": 16, \"options\" : [ \"{{ $('Articles').item.json.runflat }}\" ] , \"visible\" : true },\n       {  \"id\": 17, \"options\" : [ \"{{ $('Articles').item.json.load_index }}\" ] , \"visible\" : true },\n       {  \"id\": 18, \"options\" : [ \"{{ $('Articles').item.json.speed_index }}\" ] , \"visible\" : true },\n       {  \"id\": 20, \"options\" : [ \"{{  $ifEmpty( $('Articles').item.json.wet_grip_index, \"na\" ) }}\" ] , \"visible\" : true },\n       {  \"id\": 21, \"options\" : [ \"{{ $ifEmpty( $('Articles').item.json.noise_index , \"na\" ) }}\" ] , \"visible\" : true },\n       {  \"id\": 22, \"options\" : [ \"{{  $ifEmpty( $('Articles').item.json.noise_decible , \"na\" )}}\" ] , \"visible\" : true },\n       {  \"id\": 25, \"options\" : [ \"{{ $('Articles').item.json.ice_grip }}\" ]  , \"visible\" : true },\n       {  \"id\": 26, \"options\" : [ \"{{ $('Articles').item.json.ice_grip }}\" ] , \"visible\" : true },\n       {  \"id\": 14, \"options\" : [ \"{{ $('Articles').item.json.tyre_type }}\" ] , \"visible\" : true },\n       {  \"id\": 49, \"options\" : [ \"{{ $('Articles').item.json['3pmfs'] }}\" ] , \"visible\" : true },\n       {  \"id\": 50, \"options\" : [ \"{{ $('Articles').item.json.da_decke }}\" ] , \"visible\" : true },\n       {  \"id\": 51, \"options\" : [ \"{{  $ifEmpty( $('Articles').item.json.vehicle_class, \"na\" ) }}\" ] , \"visible\" : true }\n\n \n     ] ,\n\n   \"meta_data\" : [  \n       {  \"key\" : \"alzura-article\" , \"value\" : \"{{ $('Articles').item.json.id }}\" },\n       {  \"key\" : \"manufacturer_number\" , \"value\" : \"{{ $('Articles').item.json.manufacturer_number }}\" },\n       {  \"key\" : \"average_retail_price\" , \"value\" : \"{{ $('Articles').item.json.avg_price }}\" },\n       {  \"key\" : \"expected_delivery\" , \"value\" : \"{{ $('Articles').item.json.expected_delivery_date }}\" },\n       {  \"key\" : \"price4\" , \"value\" : \"{{ $('Articles').item.json.price_4 }}\" },\n       {  \"key\" : \"price1\" , \"value\" : \"{{ $('Articles').item.json.price_1 }}\" },\n       {  \"key\" : \"image\" , \"value\" : \"{{ $('Articles').item.json.image }}\" },\n       {  \"key\" : \"label_link\" , \"value\" : \"{{ $('Articles').item.json.tyrelabel_link }}\" },\n       {  \"key\" : \"data_sheet\" , \"value\" : \"{{ $('Articles').item.json.data_sheet }}\" },\n       {  \"key\" :  \"alzura-update\" , \"value\" : \"{{ Math.round(new Date().getTime() /1000) }}\"  }\n\n    ] \n  \n}",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "796dc5d6-4ed2-4f59-9e72-fee7a782d084",
+      "name": "Save",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        740,
+        680
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "UCRiL3mdXA8V62vH",
+          "name": "Top Auto Woo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "S",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "815ebb31-0b33-4562-82d1-0012c349da64"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Summer"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8014942a-fddf-459c-b313-46f67be947fc",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "W",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Winter"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        300,
+        380
+      ],
+      "id": "eb02f192-e2bc-4ca7-8010-f7666ed66ebc",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "293a021b-137c-4ba2-9af2-f47076c0cbf8",
+              "name": "c_",
+              "value": "[  { \"id\" :  99698 }  , { \"id\" : 99697 }   ]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        260
+      ],
+      "id": "4466290d-3365-4bf4-acde-47b1096cd5ad",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "293a021b-137c-4ba2-9af2-f47076c0cbf8",
+              "name": "c_",
+              "value": "[  {  \"id\" : 107840 }  ]",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        440
+      ],
+      "id": "0765dcdc-bfb0-42bb-b99b-92f63150cd53",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "293a021b-137c-4ba2-9af2-f47076c0cbf8",
+              "name": "c_",
+              "value": "={{ $json.c_ }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        740,
+        380
+      ],
+      "id": "b668f979-bc72-4776-82e7-e4ee9efb3226",
+      "name": "Edit Fields3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Articles": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Existing or New": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Save",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update by SKU1": {
+      "main": [
+        [
+          {
+            "node": "Existing or New",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Update by SKU1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
+  },
+  "versionId": "55a1c867-a86f-4bf9-87fd-fa3993d66d0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0f064bae8ef402bc77bc2dfa9bf8ed7b60d49005d687ffae7941232c8a9d8d44"
+  },
+  "id": "ajCqEymhR9GSCtaH",
+  "tags": [
+    {
+      "createdAt": "2025-04-23T11:50:11.058Z",
+      "updatedAt": "2025-04-23T11:50:11.058Z",
+      "id": "izN8kvL1La4b1u3F",
+      "name": "topauto"
+    }
+  ]
+}
